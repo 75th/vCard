@@ -17,7 +17,7 @@ class vCard
     protected $revision_date;
     // The vCard gnerated.
     protected $card;
-  
+
     /**
      * The constructor.
      */
@@ -69,19 +69,22 @@ class vCard
 
     /**
      * Global setter.
-     * 
+     *
      * @param string $key
      *   Name of the property.
      * @param mixed $value
      *   Value to set.
-     * 
+     *
      * @return vCard
      *   Return itself.
      */
     public function set($key, $value)
     {
         // Check if the specified property is defined.
-        if (property_exists($this, $key) && $key != 'data') {
+        if (array_key_exists($key, $this->data)) {
+            $this->data[$key] = trim($value);
+            return $this;
+        } elseif (property_exists($this, $key) && $key != 'data') {
             $this->{$key} = trim($value);
             return $this;
         } elseif (property_exists($this, $key) && $key == 'data') {
@@ -97,7 +100,7 @@ class vCard
     /**
      * Checks all the values, builds appropriate defaults for
      * missing values and generates the vcard data string.
-     */  
+     */
     function build()
     {
         if (!$this->class) {
@@ -208,7 +211,7 @@ class vCard
    	    $this->card .= "TZ:" . $this->data['timezone'] . "\r\n";
    	    $this->card .= "END:VCARD\r\n";
     }
-  
+
     /**
      * Streams the vcard to the browser client.
      */
@@ -224,7 +227,7 @@ class vCard
 
         $this->filename = str_replace(' ', '_', $this->filename);
 
-        header("Content-type: text/directory");
+        header("Content-type: text/vcard");
         header("Content-Disposition: attachment; filename=" . $this->filename . ".vcf");
         header("Pragma: public");
         echo $this->card;
